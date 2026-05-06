@@ -1,4 +1,3 @@
-// app/types/next-auth.d.ts
 import type { DefaultSession } from "next-auth";
 import type { Role } from "./roles";
 
