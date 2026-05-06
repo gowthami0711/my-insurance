@@ -32,7 +32,7 @@ export function Sidebar({
       <div className="flex h-full flex-col p-4">
         <div className="mb-6 flex items-center justify-between px-2">
           <div className="flex items-center gap-3">
-            <Image src="/images/setting.png" alt="settings" width={36} height={36} onClick={onToggleSidebar} />
+            <Image src="/images/setting.svg" alt="settings" width={36} height={36} onClick={onToggleSidebar} />
             {!isSidebarCollapsed ? (
               <p className="text-xl font-semibold">Dashboard <span className="text-[10px] font-medium text=[#838383]">v.01</span></p>
             ) : null}

@@ -10,7 +10,7 @@ type IconProps = {
 export function Icon({ name, size = 20, className = "", active = false }: IconProps) {
   return (
     <Image
-      src={`/icons/${name}.svg`}
+      src={`/images/${name}.svg`}
       alt={name}
       width={size}
       height={size}
