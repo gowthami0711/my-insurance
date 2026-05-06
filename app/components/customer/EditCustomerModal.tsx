@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import type { Customer } from "@/lib/api/customers";
 import { useUpdateCustomer } from "@/hooks/useCustomerMutation";
 
@@ -10,12 +10,8 @@ type Props = {
 };
 
 export function EditCustomerModal({ customer, onClose }: Props) {
-  const [form, setForm] = useState<Partial<Customer>>({});
+  const [form, setForm] = useState<Partial<Customer>>(customer ?? {});
   const { mutate, isPending } = useUpdateCustomer();
-
-  useEffect(() => {
-    if (customer) setForm(customer);
-  }, [customer]);
 
   if (!customer) return null;
 

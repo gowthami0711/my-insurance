@@ -22,7 +22,7 @@ export function CustomersTable() {
 
   const { canEdit, canDelete, canAssign } = usePermissions();
 
-  const { openWorkspace, isWorkspaceOpen } = useWorkspaceStore();
+  const { openWorkspace } = useWorkspaceStore();
 
   const hasActions = canEdit || canDelete || canAssign;
 
@@ -174,6 +174,7 @@ export function CustomersTable() {
       />
 
       <EditCustomerModal
+        key={editingCustomer?.id}
         customer={editingCustomer}
         onClose={() => setEditingCustomer(null)}
       />
