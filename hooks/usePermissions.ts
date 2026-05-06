@@ -1,0 +1,1 @@
+export { useRole as usePermissions } from "./useRole";

@@ -1,0 +1,70 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Customer {
+  id        String     @id @default(cuid())
+  name      String
+  company   String
+  phone     String
+  email     String     @unique
+  country   String
+  status    String     @default("Active")
+  documents Document[]
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+}
+
+model Document {
+  id          String       @id @default(cuid())
+  name        String
+  size        Int
+  pages       Int          @default(1)
+  url         String
+  key         String       // S3 object key
+  customerId  String
+  customer    Customer     @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  annotations Annotation[]
+  comments    Comment[]
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+}
+
+model Annotation {
+  id         String   @id @default(cuid())
+  documentId String
+  document   Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  page       Int
+  x          Float
+  y          Float
+  width      Float
+  height     Float
+  color      String   @default("#FFEB3B")
+  note       String?
+  author     String
+  createdAt  DateTime @default(now())
+}
+
+model Comment {
+  id         String   @id @default(cuid())
+  documentId String
+  document   Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  page       Int
+  content    String
+  author     String
+  createdAt  DateTime @default(now())
+}
+
+model User {
+  id             String   @id @default(cuid())
+  name           String
+  email          String   @unique
+  hashedPassword String
+  role           String   @default("viewer")
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
