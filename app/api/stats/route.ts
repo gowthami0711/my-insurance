@@ -9,7 +9,7 @@ export async function GET(request: NextRequest) {
   const limited = await withRateLimit(request, "api");
   if (limited) return limited;
 
-  const session = await auth
+  const session = await auth();
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   
   const [totalCustomers, members, activeNow, inactive] = await Promise.all([
