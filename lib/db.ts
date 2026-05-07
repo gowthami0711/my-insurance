@@ -6,12 +6,29 @@ declare global {
 }
 
 function createPrismaClient() {
-  const adapter = new PrismaNeon({ 
-    connectionString: process.env.DATABASE_URL! 
+  const databaseUrl = process.env.DATABASE_URL;
+  if (!databaseUrl) {
+    throw new Error("DATABASE_URL is required to initialize Prisma client");
+  }
+
+  const adapter = new PrismaNeon({
+    connectionString: databaseUrl,
   });
   return new PrismaClient({ adapter });
 }
 
-export const db = globalThis.prisma ?? createPrismaClient();
+function getPrismaClient() {
+  if (globalThis.prisma) return globalThis.prisma;
 
-if (process.env.NODE_ENV !== "production") globalThis.prisma = db;
+  const client = createPrismaClient();
+  if (process.env.NODE_ENV !== "production") globalThis.prisma = client;
+  return client;
+}
+
+export const db: PrismaClient = new Proxy({} as PrismaClient, {
+  get(_target, prop, receiver) {
+    const client = getPrismaClient();
+    const value = Reflect.get(client, prop, receiver);
+    return typeof value === "function" ? value.bind(client) : value;
+  },
+});
