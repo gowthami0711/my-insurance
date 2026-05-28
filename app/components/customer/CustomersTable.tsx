@@ -1,5 +1,6 @@
 "use client";
 
+import { memo, useCallback } from "react";
 import { useCustomers } from "@/hooks/useCustomers";
 import { useCustomersStore } from "@/store/customers.store";
 import { usePermissions } from "@/hooks/usePermissions";
@@ -7,8 +8,62 @@ import { AddCustomerModal } from "./AddCustomerModal";
 import { EditCustomerModal } from "./EditCustomerModal";
 import { DeleteCustomerModal } from "./DeleteCustomerModal";
 import { RowActions } from "./RowActions";
+import { CustomersPagination } from "./CustomersPagination";
 import { useWorkspaceStore } from "@/store/workspace.store";
+import type { Customer } from "@/lib/api/customers";
 import Image from "next/image";
+
+const TABLE_HEADERS = [
+  "Customer Name",
+  "Company",
+  "Phone Number",
+  "Email",
+  "Country",
+  "Status",
+] as const;
+
+type CustomerRowProps = {
+  customer: Customer;
+  hasActions: boolean;
+  onOpenWorkspace: (customer: Customer) => void;
+};
+
+const CustomerRow = memo(function CustomerRow({
+  customer,
+  hasActions,
+  onOpenWorkspace,
+}: CustomerRowProps) {
+  const isActive = customer.status === "Active";
+
+  return (
+    <tr
+      onClick={() => onOpenWorkspace(customer)}
+      className="cursor-pointer text-sm transition hover:bg-[#fafafa]"
+    >
+      <td className="border-b border-[#eeeeee] px-6 py-4 font-medium">{customer.name}</td>
+      <td className="border-b border-[#eeeeee] px-6 py-4">{customer.company}</td>
+      <td className="border-b border-[#eeeeee] px-6 py-4">{customer.phone}</td>
+      <td className="border-b border-[#eeeeee] px-6 py-4">{customer.email}</td>
+      <td className="border-b border-[#eeeeee] px-6 py-4">{customer.country}</td>
+      <td className="border-b border-[#eeeeee] px-6 py-4">
+        <span
+          className={`inline-flex min-w-20 items-center justify-center rounded px-2 py-1 text-xs font-medium ${
+            isActive
+              ? "border border-[#00b087] bg-[#16c09861] text-[#008767]"
+              : "border border-[#df0404] bg-[#ffc5c5] text-[#df0404]"
+          }`}
+        >
+          {customer.status}
+        </span>
+      </td>
+      {hasActions ? (
+        <td className="border-b border-[#eeeeee] px-6 py-4" onClick={(e) => e.stopPropagation()}>
+          <RowActions customer={customer} />
+        </td>
+      ) : null}
+    </tr>
+  );
+});
 
 export function CustomersTable() {
   const { data, isLoading, isError } = useCustomers();
@@ -23,18 +78,14 @@ export function CustomersTable() {
   const { canEdit, canDelete, canAssign } = usePermissions();
 
   const { openWorkspace } = useWorkspaceStore();
+  const handleOpenWorkspace = useCallback(
+    (customer: Customer) => openWorkspace(customer),
+    [openWorkspace],
+  );
 
   const hasActions = canEdit || canDelete || canAssign;
 
   if (isError) return <p className="p-6 text-red-500">Something went wrong.</p>;
-
-  function getPaginationRange(current: number, total: number) {
-    if (total <= 7) return Array.from({ length: total }, (_, i) => i + 1);
-
-    if (current <= 4) return [1, 2, 3, 4, 5, "...", total];
-    if (current >= total - 3) return [1, "...", total - 4, total - 3, total - 2, total - 1, total];
-    return [1, "...", current - 1, current, current + 1, "...", total];
-  }
 
   return (
     <section className="overflow-hidden rounded-3xl bg-white">
@@ -88,7 +139,7 @@ export function CustomersTable() {
           <table className="min-w-[900px] w-full border-separate border-spacing-0 text-left">
             <thead className="text-sm text-[#B5B7C0] font-medium">
               <tr>
-                {["Customer Name", "Company", "Phone Number", "Email", "Country", "Status"].map((h) => (
+                {TABLE_HEADERS.map((h) => (
                   <th key={h} className="border-y border-[#eeeeee] px-6 py-3 font-medium">{h}</th>
                 ))}
                 {/* only show Actions column if user has at least one action permission */}
@@ -98,75 +149,27 @@ export function CustomersTable() {
               </tr>
             </thead>
             <tbody>
-              {data?.customers.map((customer) => {
-                const isActive = customer.status === "Active";
-                return (
-                  <tr
-                    key={customer.id}
-                    onClick={() => openWorkspace(customer)}
-                    className={`cursor-pointer text-sm transition hover:bg-[#fafafa]`}
-                  >
-                    <td className="border-b border-[#eeeeee] px-6 py-4 font-medium">{customer.name}</td>
-                    <td className="border-b border-[#eeeeee] px-6 py-4">{customer.company}</td>
-                    <td className="border-b border-[#eeeeee] px-6 py-4">{customer.phone}</td>
-                    <td className="border-b border-[#eeeeee] px-6 py-4">{customer.email}</td>
-                    <td className="border-b border-[#eeeeee] px-6 py-4">{customer.country}</td>
-                    <td className="border-b border-[#eeeeee] px-6 py-4">
-                      <span className={`inline-flex min-w-20 items-center justify-center rounded px-2 py-1 text-xs font-medium ${isActive
-                        ? "border border-[#00b087] bg-[#16c09861] text-[#008767]"
-                        : "border border-[#df0404] bg-[#ffc5c5] text-[#df0404]"
-                        }`}>
-                        {customer.status}
-                      </span>
-                    </td>
-                    {hasActions ? (
-                      <td className="border-b border-[#eeeeee] px-6 py-4" onClick={(e) => e.stopPropagation()}>
-                        <RowActions customer={customer} />
-                      </td>
-                    ) : null}
-                  </tr>
-                );
-              })}
+              {data?.customers.map((customer) => (
+                <CustomerRow
+                  key={customer.id}
+                  customer={customer}
+                  hasActions={hasActions}
+                  onOpenWorkspace={handleOpenWorkspace}
+                />
+              ))}
             </tbody>
           </table>
         )}
       </div>
 
-      {/* pagination */}
-      <div className="flex flex-wrap items-center justify-between gap-3 px-6 py-4 text-xs text-[#b5b7c0]">
-        <p>Showing page {page} of {data?.totalPages ?? "—"} ({data?.total ?? "—"} entries)</p>
-        <div className="flex items-center gap-2">
-          <button
-            type="button"
-            onClick={() => setPage(Math.max(1, page - 1))}
-            disabled={page === 1}
-            className="grid h-6 w-6 place-items-center rounded-md border border-[#eeeeee] bg-[#f5f5f5] text-[#404b52] disabled:opacity-40"
-          >{"<"}</button>
-
-          {getPaginationRange(page, data?.totalPages ?? 1).map((p, i) =>
-            p === "..." ? (
-              <span key={`ellipsis-${i}`} className="text-xs text-[#b5b7c0] px-1">…</span>
-            ) : (
-              <button
-                key={p}
-                type="button"
-                onClick={() => setPage(p as number)}
-                className={`grid h-6 w-6 place-items-center rounded-md border text-xs ${p === page
-                  ? "border-[#5932ea] bg-[#5932ea] text-white"
-                  : "border-[#eeeeee] bg-[#f5f5f5] text-[#404b52]"
-                  }`}
-              >{p}</button>
-            )
-          )}
-
-          <button
-            type="button"
-            onClick={() => setPage(Math.min(data?.totalPages ?? 1, page + 1))}
-            disabled={page === data?.totalPages}
-            className="grid h-6 w-6 place-items-center rounded-md border border-[#eeeeee] bg-[#f5f5f5] text-[#404b52] disabled:opacity-40"
-          >{">"}</button>
-        </div>
-      </div>
+      {data ? (
+        <CustomersPagination
+          page={page}
+          totalPages={data.totalPages}
+          total={data.total}
+          onPageChange={setPage}
+        />
+      ) : null}
 
       <AddCustomerModal
         isOpen={isAddingCustomer}

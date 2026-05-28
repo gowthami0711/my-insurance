@@ -46,6 +46,7 @@ describe("Sidebar", () => {
   it("renders user info and signs out", () => {
     render(
       <Sidebar
+        pathname="/customers"
         isSidebarCollapsed={false}
         isMobileMenuOpen
         onToggleSidebar={onToggleSidebar}

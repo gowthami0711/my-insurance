@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { memo } from "react";
 
 type IconProps = {
   name: string;
@@ -7,7 +8,12 @@ type IconProps = {
   active?: boolean;
 };
 
-export function Icon({ name, size = 20, className = "", active = false }: IconProps) {
+export const Icon = memo(function Icon({
+  name,
+  size = 20,
+  className = "",
+  active = false,
+}: IconProps) {
   return (
     <Image
       src={`/images/${name}.svg`}
@@ -17,6 +23,6 @@ export function Icon({ name, size = 20, className = "", active = false }: IconPr
       className={`${active ? "brightness-0 invert" : "opacity-60"} ${className}`}
     />
   );
-}
+});
 
 export default Icon; 

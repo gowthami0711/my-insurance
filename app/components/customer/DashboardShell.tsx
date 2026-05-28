@@ -1,10 +1,12 @@
 "use client";
 
+import { usePathname } from "next/navigation";
 import { useUIStore } from "@/store/ui-store";
 import { Sidebar } from "./Sidebar";
 import { Header } from "./Header";
 
 export function DashboardShell({ children }: { children: React.ReactNode }) {
+  const pathname = usePathname();
   const { isSidebarCollapsed, isMobileMenuOpen, toggleSidebar, openMobileMenu, closeMobileMenu } =
     useUIStore();
 
@@ -20,6 +22,7 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
           />
         ) : null}
         <Sidebar
+          pathname={pathname}
           isSidebarCollapsed={isSidebarCollapsed}
           isMobileMenuOpen={isMobileMenuOpen}
           onToggleSidebar={toggleSidebar}
