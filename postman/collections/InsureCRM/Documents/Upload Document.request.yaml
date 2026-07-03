@@ -1,0 +1,20 @@
+$kind: http-request
+name: Upload Document
+method: POST
+url: '{{baseUrl}}/api/documents'
+order: 2000
+auth:
+  type: bearer
+  credentials:
+    - key: token
+      value: '{{authToken}}'
+body:
+  type: json
+  content: |-
+    {
+      "fileName": "policy.pdf",
+      "fileType": "application/pdf",
+      "fileSize": 102400,
+      "customerId": "{{customerId}}",
+      "pages": 5
+    }

@@ -1,0 +1,11 @@
+$kind: collection
+name: InsureCRM
+variables:
+  - key: baseUrl
+    value: 'http://localhost:3000'
+  - key: authToken
+    value: ''
+  - key: customerId
+    value: ''
+  - key: documentId
+    value: ''

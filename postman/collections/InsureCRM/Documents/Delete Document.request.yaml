@@ -1,0 +1,10 @@
+$kind: http-request
+name: Delete Document
+method: DELETE
+url: '{{baseUrl}}/api/documents/{{documentId}}'
+order: 4000
+auth:
+  type: bearer
+  credentials:
+    - key: token
+      value: '{{authToken}}'

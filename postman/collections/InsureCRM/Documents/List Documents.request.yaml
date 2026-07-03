@@ -1,0 +1,13 @@
+$kind: http-request
+name: List Documents
+method: GET
+url: '{{baseUrl}}/api/documents'
+order: 1000
+queryParams:
+  - key: customerId
+    value: '{{customerId}}'
+auth:
+  type: bearer
+  credentials:
+    - key: token
+      value: '{{authToken}}'

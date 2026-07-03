@@ -1,0 +1,9 @@
+name: InsureCRM - Local
+values:
+  - key: baseUrl
+    value: 'http://localhost:3000'
+    enabled: true
+  - key: authToken
+    value: ''
+    enabled: true
+    secret: true
